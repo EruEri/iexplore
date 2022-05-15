@@ -1,8 +1,0 @@
-lib: [
-  "_build/install/default/lib/iExplore/META"
-  "_build/install/default/lib/iExplore/dune-package"
-  "_build/install/default/lib/iExplore/opam"
-]
-bin: [
-  "_build/install/default/bin/iExplore"
-]
