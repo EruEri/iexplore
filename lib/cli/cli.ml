@@ -26,15 +26,13 @@ let main_start () =
    
   Clap.close ();
 
-  print_string("const char *, ...");
-
-  let _ = match new_usb_device () with
+  let connection = match new_usb_device () with
   | Error e ->  failwith (Printf.sprintf "Error : %s\n" (string_of_idevice_error e)); 
   | Ok c -> c in
 
 
   match command with
-  | `navigate -> Printf.printf "Will naviagte in C\n";
+  | `navigate -> Caml_core.navigate_device connection ()
   | `dl_music (output_dir, all, limit, offset) -> 
     output_dir |> Option.iter (Printf.printf "ouput_dir = %s\n");
     Printf.printf "all = %b" (all);

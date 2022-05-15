@@ -68,7 +68,6 @@ CAMLprim value caml_create_path(value components) {
 }
 
 CAMLprim value caml_new_usb_device(value unit){
-    user_input_t input = get_user_input("Input\n");
     afc_connection_t* connection = new_usb_device();
     switch (connection->result.error) {
     case DEVICE_ERROR:
@@ -97,13 +96,43 @@ CAMLprim value caml_afc_connection_free(value client, value unit){
 CAMLprim value caml_navigate_device(value client, value unit){
     CAMLparam1(client);
     afc_connection_t* afc_client = Afc_connection_val(client);
-    char** directory_info = nil;
+    char** directory_info;
     char** info_file;
 
     path_t* path = new_path(nil, 0);
 
     while (true) {
+        directory_info = nil;
+        const char* str_path = malloc_to_string(path);
+        if (!path) exit_with_message(1, "Unable to display the path");
 
+        if (afc_read_directory(afc_client->result.client,
+         str_path, &directory_info) != AFC_E_SUCCESS) {
+            free_malloc_string((char *) str_path);
+            printf("directory error\n");
+            continue;
+        }
+        printf("PATH : %s\n", str_path);
+        free_malloc_string((char *) str_path);
+        afc_print_dict(directory_info);
+        printf("Which folder do you want to enter?\n");
+        printf("i : info - q : quit - c : copy\n");
+        user_input_t user_input = get_user_input("");
+        switch (user_input.choice) {
+        case NUMBER:{
+            char* component = directory_info[user_input.value.number_choose -1];
+            add_path_component(path, (const char*) component); 
+            continue;
+        }
+        case COPY : 
+            printf("Which file\nNot implemented yet\n");
+            continue;;
+        case INFO :
+            printf("For which file\nNot implemented yet\n");
+            continue;
+        case QUIT : 
+            exit_with_message(0, "Programm end\n");
+        }
     }
     return Val_unit;
 }

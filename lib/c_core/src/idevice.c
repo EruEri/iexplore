@@ -1,5 +1,6 @@
 #include <libimobiledevice/afc.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "../include/idevice.h"
 #include "../include/util.h"
@@ -73,4 +74,10 @@ void afc_connection_free(afc_connection_t * connection){
     if (connection->result.client) afc_client_free(connection->result.client);
     
     free(connection);
+}
+
+void afc_print_dict(char** directory){
+    int i = 0;
+    char* folder;
+    while( (folder = directory[i]) ) printf("%02d : %s\n", ++i, folder);
 }

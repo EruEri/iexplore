@@ -26,7 +26,6 @@ user_input_t get_user_input(const char* message){
     if (Is_block(input) && Field(input, 0) == caml_hash_variant(Input_Number) ) {
         user_input.choice = NUMBER;
         user_input.value.number_choose = Int_val(Field(input, 1));
-        printf("Option choose = %d\n", user_input.value.number_choose);
     } else if (input == caml_hash_variant(Input_Info)) {
         user_input.choice = INFO;
     } else if (input == caml_hash_variant(Input_Copy)) {

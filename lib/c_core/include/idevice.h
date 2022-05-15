@@ -25,5 +25,6 @@ typedef struct{
 
 afc_connection_t* new_usb_device();
 void afc_connection_free(afc_connection_t*);
+void afc_print_dict(char** directory);
 
 #endif

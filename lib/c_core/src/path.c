@@ -87,3 +87,23 @@ void show_path(path_t* path){
         if (i <= path->lenght -1) printf("/");
     }
 }
+
+const char* malloc_to_string(path_t* path){
+    char* string = malloc(sizeof(char));
+    if (!string) return nil;
+    *string = path->lenght == 0 ? '/' : '\0';
+    for (int i = 0 ; i < path->lenght; i ++){
+        char* component = path->components[i];
+        size_t component_len = strlen(component);
+        char* tmp = realloc(string, strlen(string) + 1 + component_len + 1);
+        if (!tmp) return nil;
+        string = tmp;
+        strcat(string, "/");
+        strcat(string, component);
+    }
+    return string;
+}
+
+void free_malloc_string(char* str){
+    free(str);
+}

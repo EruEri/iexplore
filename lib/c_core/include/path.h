@@ -23,4 +23,8 @@ bool_t has_component(path_t*);
 
 void show_path(path_t*);
 
+const char* malloc_to_string(path_t*);
+
+void free_malloc_string(char*);
+
 #endif
