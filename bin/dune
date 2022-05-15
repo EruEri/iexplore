@@ -1,6 +1,6 @@
 (executable
- (public_name iExplore)
- (name main)
+ (public_name iexplore)
+ (name iexplore)
  (ocamlopt_flags :standard -linkall (
   -cclib -limobiledevice-1.0.6
  ))
