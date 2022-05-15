@@ -1,26 +1,24 @@
 (lang dune 3.1)
 
-(name iExplore)
+(name iexplore)
 
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github EruEri/iexplore))
 
-(authors "Author Name")
+(authors "EruEri")
 
-(maintainers "Maintainer Name")
+(maintainers "EruEri")
 
 (license LICENSE)
 
-(documentation https://url/to/documentation)
 
 (package
- (name iExplore)
- (synopsis "A short synopsis")
- (description "A longer description")
- (depends ocaml dune)
+ (name iexplore)
+ (synopsis "Little program to explore Iphone's internal files")
+ (depends ocaml dune clap)
  (tags
-  (topics "to describe" your project)))
+  (iPhone)))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
