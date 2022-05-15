@@ -1,0 +1,10 @@
+(** @canonical IExplore.Caml_callback *)
+module Caml_callback = IExplore__Caml_callback
+
+
+(** @canonical IExplore.Caml_core *)
+module Caml_core = IExplore__Caml_core
+
+
+(** @canonical IExplore.Cli *)
+module Cli = IExplore__Cli

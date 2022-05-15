@@ -1,0 +1,9 @@
+(include_subdirs unqualified)
+
+(library
+ (name iExplore)
+ (foreign_stubs (language c) (names path util caml_core idevice caml_callback) )
+ (install_c_headers path util idevice caml_callback)
+ (libraries clap)
+ (modules cli caml_core caml_callback)
+ )

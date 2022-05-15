@@ -1,0 +1,4 @@
+(lang dune 3.1)
+(name iExplore)
+(sections (lib .) (bin ../../bin))
+(files (lib (META dune-package opam)) (bin (iExplore)))
