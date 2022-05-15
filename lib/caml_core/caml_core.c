@@ -68,8 +68,7 @@ CAMLprim value caml_create_path(value components) {
 }
 
 CAMLprim value caml_new_usb_device(value unit){
-
-    get_input("const char *message");
+    user_input_t input = get_user_input("Input\n");
     afc_connection_t* connection = new_usb_device();
     switch (connection->result.error) {
     case DEVICE_ERROR:

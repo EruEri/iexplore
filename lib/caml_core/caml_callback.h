@@ -3,7 +3,19 @@
 
 #include "caml/mlvalues.h"
 
+typedef enum{
+    NUMBER,
+    COPY,
+    INFO,
+    QUIT
+} user_choice_t;
+typedef struct{
+    user_choice_t choice;
+    union {
+        int number_choose;
+    }value;
+} user_input_t;
 
-value get_input(const char* message);
+user_input_t get_user_input(const char* message);
 
 #endif
