@@ -20,6 +20,13 @@ static value get_input(const char* message){
     return input;
 }
 
+int read_int(const char* message, const char* error_message){
+    static const value* read_int_safe_closure = NULL;
+    if (!read_int_safe_closure) read_int_safe_closure = caml_named_value("read_int");
+    value read = caml_callback3(*read_int_safe_closure, caml_copy_string(message), caml_copy_string(error_message), Val_unit);
+    return Int_val(read);
+}
+
 user_input_t get_user_input(const char* message){
     value input = get_input(message);
     user_input_t user_input;

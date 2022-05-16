@@ -1,3 +1,4 @@
+#include <stdio.h>
 #define CAML_NAME_SPACE
 
 #include <caml/mlvalues.h>
@@ -103,13 +104,15 @@ CAMLprim value caml_navigate_device(value client, value unit){
 
     while (true) {
         directory_info = nil;
-        const char* str_path = malloc_to_string(path);
+        char* str_path = (char*) malloc_to_string(path);
         if (!path) exit_with_message(1, "Unable to display the path");
 
         if (afc_read_directory(afc_client->result.client,
          str_path, &directory_info) != AFC_E_SUCCESS) {
-            free_malloc_string((char *) str_path);
+            free_malloc_string(str_path);
+            remove_last_path_component(path);
             printf("directory error\n");
+            printf("Maybe is a file\n");
             continue;
         }
         printf("PATH : %s\n", str_path);
@@ -127,9 +130,24 @@ CAMLprim value caml_navigate_device(value client, value unit){
         case COPY : 
             printf("Which file\nNot implemented yet\n");
             continue;;
-        case INFO :
-            printf("For which file\nNot implemented yet\n");
+        case INFO :{
+            int file_choose = read_int("Which file (pick number)\n> ", "Please enter a number\n");
+            char* component = directory_info[file_choose -1];
+            add_path_component(path, component);
+            str_path = (char*) malloc_to_string(path);
+            remove_last_path_component(path);
+            if (!str_path) {
+                printf("Unable to create path\n");
+                continue;
+            }
+            if (afc_get_file_info(afc_client->result.client, 
+            str_path, &info_file) != AFC_E_SUCCESS) {
+                printf("Unable to fetch file Info\nMaybe it's a diretory\n");
+                free_malloc_string(str_path);
+            }
+            afc_print_dict(info_file);
             continue;
+        }
         case QUIT : 
             exit_with_message(0, "Programm end\n");
         }
