@@ -1,5 +1,8 @@
-#include <stdio.h>
 #define CAML_NAME_SPACE
+
+#include <stdio.h>
+#include <stdint.h>
+
 
 #include <caml/mlvalues.h>
 #include "../c_core/include/path.h"
@@ -112,7 +115,7 @@ CAMLprim value caml_navigate_device(value client, value unit){
             free_malloc_string(str_path);
             remove_last_path_component(path);
             printf("directory error\n");
-            printf("Maybe is a file\n");
+            printf("Maybe it's a file\n");
             continue;
         }
         printf("PATH : %s\n", str_path);
@@ -127,9 +130,36 @@ CAMLprim value caml_navigate_device(value client, value unit){
             add_path_component(path, (const char*) component); 
             continue;
         }
-        case COPY : 
-            printf("Which file\nNot implemented yet\n");
-            continue;;
+        case COPY :{
+            int file_choose = read_int("Which file (pick number)\n> ", "Please enter a number\n");
+            const char* output_path = read_line();
+            char* component = directory_info[file_choose -1];
+            add_path_component(path, component);
+            str_path = (char*) malloc_to_string(path);
+            remove_last_path_component(path);
+            if (!str_path) {
+                printf("Unable to create path\n");
+                continue;
+            }
+            uint64_t fd = 0;
+            if (afc_file_open(afc_client->result.client, str_path, AFC_FOPEN_RDONLY, &fd) != AFC_E_SUCCESS) {
+                printf("Unable to open the selected file\n");
+                free_malloc_string(str_path);
+                continue;
+            }
+
+            if (copy_intern_file(afc_client, fd, output_path) != 0) {
+                printf("Error while copying the file\n");
+                free_malloc_string(str_path);
+                afc_file_close(afc_client->result.client, fd);
+                continue;
+            }
+
+            free_malloc_string(str_path);
+            afc_file_close(afc_client->result.client, fd);
+            continue;
+            }
+            
         case INFO :{
             int file_choose = read_int("Which file (pick number)\n> ", "Please enter a number\n");
             char* component = directory_info[file_choose -1];

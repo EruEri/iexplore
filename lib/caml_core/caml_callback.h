@@ -18,6 +18,8 @@ typedef struct{
 
 user_input_t get_user_input(const char* message);
 
+const char* read_line();
+
 int read_int(const char* message, const char* error_message);
 
 #endif

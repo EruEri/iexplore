@@ -81,3 +81,66 @@ void afc_print_dict(char** directory){
     char* folder;
     while( (folder = directory[i]) ) printf("%02d : %s\n", ++i, folder);
 }
+
+afc_file_t** afc_file_dir_of_string_dir(path_t* path){
+    printf("Not implemented yet\n");
+    exit(-1);
+}
+
+afc_file_t* new_file_info(afc_client_t client, path_t* path, char* last_component){
+    char** file_info = nil;
+    if (add_path_component(path, last_component) == -1) return nil;
+
+    const char* str_path = malloc_to_string(path);
+    remove_last_path_component(path);
+
+    if (!str_path) return nil;
+    if (afc_get_file_info(client, str_path , &file_info) != AFC_E_SUCCESS) {
+        free_malloc_string((char *) str_path);
+        return nil;
+    }
+    free_malloc_string((char *) str_path);
+
+    afc_file_t* file = malloc(sizeof(afc_file_t));
+    if (!file) return nil;
+
+    file->st_size = atoi(file_info[1]);
+    file->st_blocks = atoi(*(file_info + 3));
+    file->st_nlink = atoi(file_info[5]);
+    file->file_type = make_str_copy(file_info[7]);
+    file->_st_mtime = atoll(file_info[9]);
+    file->_st_birthtime = atoll(file_info[11]);
+    file->filename = make_str_copy(last_component);
+
+    afc_dictionary_free(file_info);
+    return file;
+}
+
+int copy_intern_file(afc_connection_t* connection, uint64_t iphone_fd, const char* output_path){
+    FILE* output = fopen(output_path, "ab+");
+    if (!output) return -1;
+    afc_client_t client = connection->result.client;
+    const unsigned int BYTES_TO_READ = 500000;
+    unsigned int bytes_read = 0;
+    char buffer[BYTES_TO_READ];
+
+    do {
+        if (afc_file_read(client, iphone_fd, buffer, BYTES_TO_READ, &bytes_read) != AFC_E_SUCCESS) {
+            fclose(output);
+            return -1;
+        }
+        fwrite(buffer, sizeof(char), bytes_read, output);
+    }while (bytes_read == BYTES_TO_READ);
+
+    fclose(output);
+    return 0;
+}
+
+
+
+
+void free_file_info(afc_file_t* file){
+    free(file->filename);
+    free(file->file_type);
+    free(file);
+}

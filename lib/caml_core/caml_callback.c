@@ -27,6 +27,13 @@ int read_int(const char* message, const char* error_message){
     return Int_val(read);
 }
 
+const char* read_line() {
+    static const value* get_read_line = NULL;
+    if (!get_read_line) get_read_line = caml_named_value("read_line");
+    value input = caml_callback(*get_read_line, Val_unit);
+    return String_val(input);
+}
+
 user_input_t get_user_input(const char* message){
     value input = get_input(message);
     user_input_t user_input;

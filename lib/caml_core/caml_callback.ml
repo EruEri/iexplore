@@ -15,5 +15,10 @@ let rec read_int_safe message error_message () =
   | None -> print_string error_message; read_int_safe message error_message()
 ;;
 
+let read_line_message () = 
+  Printf.printf "Output path\n> ";
+  read_line ()
+
 let () = Callback.register "get_input" get_input;;
 let () = Callback.register "read_int" read_int_safe;;
+let () = Callback.register "read_line" read_line_message;;
