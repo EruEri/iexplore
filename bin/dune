@@ -2,7 +2,7 @@
  (public_name iexplore)
  (name iexplore)
  (ocamlopt_flags :standard -linkall (
-  -cclib -limobiledevice-1.0.6
+  -cclib -limobiledevice-1.0
  ))
  (libraries iExplore)
  )
