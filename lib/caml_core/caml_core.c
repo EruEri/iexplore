@@ -104,8 +104,9 @@ CAMLprim value caml_navigate_device(value client, value unit){
     char** info_file;
 
     path_t* path = new_path(nil, 0);
-
+    int i = 0;
     while (true) {
+        if (i == 5) exit_with_message(1, "Read dictonary error limit\n");
         directory_info = nil;
         char* str_path = (char*) malloc_to_string(path);
         if (!path) exit_with_message(1, "Unable to display the path");
@@ -116,8 +117,10 @@ CAMLprim value caml_navigate_device(value client, value unit){
             remove_last_path_component(path);
             printf("directory error\n");
             printf("Maybe it's a file\n");
+            i += 1;
             continue;
         }
+        i = 0;
         printf("PATH : %s\n", str_path);
         free_malloc_string((char *) str_path);
         afc_print_dict(directory_info);

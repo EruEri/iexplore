@@ -95,11 +95,21 @@ const char* malloc_to_string(path_t* path){
     for (int i = 0 ; i < path->lenght; i ++){
         char* component = path->components[i];
         size_t component_len = strlen(component);
-        char* tmp = realloc(string, strlen(string) + 1 + component_len + 1);
+        char* tmp = realloc(string, strlen(string) + 1 + component_len + 1); // string + / + component + \0
         if (!tmp) return nil;
         string = tmp;
         strcat(string, "/");
         strcat(string, component);
+        strcat(string, "\0");
+    }
+    if (path->lenght == 0) {
+        char* tmp = realloc(string, sizeof(char) * 2);
+        if (!tmp) {
+            free(string);
+            return nil;
+        }
+        tmp[1] = '\0';
+        return tmp;
     }
     return string;
 }
