@@ -11,7 +11,7 @@
 
 (maintainers "EruEri")
 
-(license LICENSE)
+(license GPL-3.0)
 
 
 (package
