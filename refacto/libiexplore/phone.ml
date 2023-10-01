@@ -21,7 +21,7 @@ type t = {
   lockdown_client: Cbindings.ImobileDevice.lockdownd_client_t;
   service: Cbindings.ImobileDevice.lockdownd_service_descriptor_t;
   client: Cbindings.ImobileDevice.afc_client_t;
-  path: Path.t;
+  mutable path: Path.t;
 }
 
 
@@ -45,3 +45,6 @@ let read_path : t -> (string array, Cbindings.ImobileDevice.afc_error_t) result 
   fun {device = _; lockdown_client = _; service = _; client; path} -> 
     let path = Path.to_string path in
     Cbindings.ImobileDevice.afc_read_directory client path
+
+let pwd phone =
+  Path.to_string phone.path

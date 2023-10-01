@@ -32,6 +32,8 @@ let commands =
   Commands.empty
   |> Commands.add Cmls.name ( module Cmls : Command.Command)
   |> Commands.add Cmclear.name (module Cmclear : Command.Command)
+  |> Commands.add Cmpwd.name (module Cmpwd : Command.Command)
+  |> Commands.add Cmcd.name (module Cmcd : Command.Command)
 
 let rec repl code phone = 
   try 

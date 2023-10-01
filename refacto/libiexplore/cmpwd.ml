@@ -15,33 +15,45 @@
 (*                                                                                            *)
 (**********************************************************************************************)
 
-type t = string list
 
-let (//) = Printf.sprintf "%s/%s"
+open Cmdliner
 
-let rec rev_concat = function 
-  | []  -> "/"
-  | t::[] -> Printf.sprintf "/%s" t
-  | t::q -> 
-    let head = rev_concat q in
-    head // t
+let name = "pwd"
 
-let to_string = rev_concat
+let clear_console = "\u{001B}[2J"
 
-let of_string s =
-  s |> String.split_on_char '/' |> List.rev
-
-let root = []
-
-let backward = function
-  | [] -> [] 
-  | _::q -> q
-
-let push elt path = match elt with
-    | "." -> path
-    | ".." -> backward path
-    | elt -> elt::path
+type cmd = {
+  unit : unit
+}[@@ unboxed]
 
 
-let concat base next = 
-  next @ base
+
+
+let cmd_term phone run = 
+  let combine () = run phone {unit = ()}
+  in
+  Term.(const @@ combine ())
+
+
+let doc = "$(iname) - current working directory"
+
+let man = [
+  `S Manpage.s_description;
+  `P "Current working directory"
+]
+
+let navigate phone run = 
+  let info = 
+    Cmd.info ~doc ~man  name
+  in
+  Cmd.v info (cmd_term phone run)
+
+let run phone cmd = 
+  let {unit = ()} = cmd in
+  let () = Printf.printf "%s\n%!" @@ Phone.pwd phone in
+  Ok ()
+
+let command phone = navigate phone run
+
+
+let eval argv phone = Cmd.eval_result ~argv (command phone)
