@@ -50,3 +50,6 @@ let run cmd =
   in
   let () = Libiexplore.Repl.repl phone in
   ()
+
+
+let eval () = Cmd.eval (navigate run)
