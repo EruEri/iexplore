@@ -1,4 +1,4 @@
 (* IExplore.Cli.main_start ();; *)
 
-let code = Commandline.Navigate.eval ()
+let code = Commandline.eval ()
 let () = exit code

@@ -19,13 +19,21 @@ open Cmdliner
 
 let name = "navigate"
 
-type cmd = unit
+type cmd = {
+  dummy : bool
+}
+
+
+let dummy_term = 
+  Arg.(
+    value & flag & info ["d"] 
+  )
 
 
 let cmd_term run = 
-  let combine () = run @@ ()
+  let combine dummy = run @@ {dummy}
   in
-  Term.(const @@ combine ())
+  Term.(const @@ combine $ dummy_term)
 
 
 let doc = "Navigate"
@@ -42,7 +50,7 @@ let navigate run =
   Cmd.v info (cmd_term run)
 
 let run cmd = 
-  let () = cmd in
+  let {dummy = _} = cmd in
   let phone = 
     match Libiexplore.Phone.create () with
     | Ok phone -> phone
@@ -51,5 +59,6 @@ let run cmd =
   let () = Libiexplore.Repl.repl phone in
   ()
 
+let command = navigate run
 
-let eval () = Cmd.eval (navigate run)
+let eval () = Cmd.eval @@ command

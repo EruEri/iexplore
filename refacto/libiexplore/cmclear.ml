@@ -15,33 +15,41 @@
 (*                                                                                            *)
 (**********************************************************************************************)
 
+
 open Cmdliner
 
-let name = "iexplore"
+let name = "clear"
+
+let clear_console = "\u{001B}[2J"
+
+type cmd = unit
 
 
-(* let version =
-  let s =
-    match Build_info.V1.version () with
-    | None ->
-        "n/a"
-    | Some v ->
-        Build_info.V1.Version.to_string v
+let cmd_term phone run = 
+  let combine () = run phone ()
   in
-  Printf.sprintf "%s" s *)
+  Term.(const @@ combine ())
 
-let root_doc = "an iphone file explorer"
 
-let root_man =
-  [
-    `S Manpage.s_description;
-    `P "$(iname) allows to browser file within your iPhone";
-  ]
+let doc = "$(iname) - clear the console screen"
 
-let root_info = Cmd.info name ~doc:root_doc ~man:root_man ~version:"0.2.0"
-let subcommands = [ Navigate.command ]
-let parse () = Cmd.group root_info subcommands
+let man = [
+  `S Manpage.s_description;
+  `P "Clear the console screen"
+]
 
-let eval () =
-  () |> parse |> Cmd.eval
+let navigate phone run = 
+  let info = 
+    Cmd.info ~doc ~man  name
+  in
+  Cmd.v info (cmd_term phone run)
 
+let run _ cmd = 
+  let () = cmd in
+  let () = Printf.printf "%s" clear_console in
+  Ok ()
+
+let command phone = navigate phone run
+
+
+let eval argv phone = Cmd.eval_result ~argv (command phone)

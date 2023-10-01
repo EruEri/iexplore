@@ -19,7 +19,7 @@
 (*
   Maybe in a config file one day   
 *)
-let prompt = ">"
+let prompt = "> "
 
 let read () =
   let () = Printf.printf "%s" prompt in
@@ -30,7 +30,8 @@ module Commands = Map.Make(String)
 
 let commands = 
   Commands.empty
-  |> Commands.add Ls.name ( module Ls : Command.Command)
+  |> Commands.add Cmls.name ( module Cmls : Command.Command)
+  |> Commands.add Cmclear.name (module Cmclear : Command.Command)
 
 let rec repl code phone = 
   try 
@@ -40,7 +41,7 @@ let rec repl code phone =
       | [] -> repl 0 phone
       | "exit"::_ -> ()
       | "$?"::_ -> let () = Printf.printf "%u" code in repl 0 phone
-      | t::argv -> 
+      | ( t::_ as argv )-> 
         let (module C) = Commands.find t commands in
         let i = C.eval (Array.of_list argv) phone in
         repl i phone
