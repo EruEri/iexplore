@@ -17,4 +17,4 @@
 
 (library
  (name libiexplore)
- (libraries cbindings))
+ (libraries cmdliner cbindings))

@@ -15,12 +15,19 @@
 (*                                                                                            *)
 (**********************************************************************************************)
 
-type error = 
+type explore_error = 
   | DeviceError of Cbindings.ImobileDevice.idevice_error_t
   | LockDownError of Cbindings.ImobileDevice.lockdownd_error_t
   | AfcError of Cbindings.ImobileDevice.afc_error_t
+  | FileDoesntExist of string
 
 
 let device_error e = DeviceError e
 let lockdown_error e = LockDownError e
 let afc_error e = AfcError e
+
+
+exception ExploreError of explore_error
+
+
+let exn_explore_error e = ExploreError e

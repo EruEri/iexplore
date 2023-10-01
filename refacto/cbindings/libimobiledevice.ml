@@ -119,6 +119,12 @@ external lockdownd_start_service : ?identifier:string -> lockdownd_client_t -> (
 external afc_client_new : idevice_t -> lockdownd_service_descriptor_t -> (afc_client_t, afc_error_t) result = 
   "caml_afc_client_new"
 
+external afc_read_directory : afc_client_t -> string -> (string array, afc_error_t) result = 
+ "caml_afc_read_directory"
+
+external afc_get_file_info : afc_client_t -> string -> (string array, afc_error_t) result = 
+  "caml_afc_get_file_info"
+
 external idevice_free : idevice_t -> unit = "caml_idevice_free"
 
 external lockdownd_client_free : lockdownd_client_t -> unit = "caml_lockdownd_client_free"

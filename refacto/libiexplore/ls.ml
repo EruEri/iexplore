@@ -15,10 +15,44 @@
 (*                                                                                            *)
 (**********************************************************************************************)
 
+open Cmdliner
 
-module type Command = sig
-  val name : string
+let name = "ls"
 
-end
+type cmd = unit
 
-module Ls = Ls
+
+let cmd_term phone run = 
+  let combine () = run phone ()
+  in
+  Term.(const @@ combine ())
+
+
+let doc = "ls - list directory content"
+
+let man = [
+  `S Manpage.s_description;
+  `P "List file within the directory"
+]
+
+let navigate phone run = 
+  let info = 
+    Cmd.info ~doc ~man  name
+  in
+  Cmd.v info (cmd_term phone run)
+
+let run phone cmd = 
+  let () = cmd in
+  let (let*) = Result.bind in
+  let ( |? ) f m = Result.map_error m f in
+  let ok = Result.ok in
+  let* directory = Phone.read_path phone |? (fun e -> Printexc.to_string @@ Error.exn_explore_error @@ Error.afc_error e) in
+  let () = 
+    Array.iter (Printf.printf "%s\n") directory 
+  in 
+  ok ()
+
+let command phone = navigate phone run
+
+
+let eval argv phone = Cmd.eval_result ~argv (command phone)

@@ -1,4 +1,5 @@
 
+#include <stddef.h>
 #include <stdlib.h>
 #include "libimobiledevice/libimobiledevice.h"
 #include "libimobiledevice/afc.h"
@@ -8,18 +9,37 @@
 #include "caml/alloc.h"
 
 
-
-
-static value val_ok(value caml_variable, value affect) {
-    caml_variable = caml_alloc(1, 0);
-    Field(caml_variable, 0) = affect;
-    return caml_variable;
+size_t directory_length(const char** directory) {
+    size_t i = 0;
+    for (const char* elt = directory[0]; elt != NULL; directory += 1) {
+        i += 1;
+    }
+    return i;
 }
 
-static value val_err(value caml_variable, value affect) {
+ 
+
+value init_directory(const char** directory) {
+    CAMLparam0();
+    CAMLlocal1(caml_directory);
+    caml_directory = caml_alloc_array(caml_copy_string, directory);
+    CAMLreturn(caml_directory);
+}
+
+static value val_ok(value affect) {
+    CAMLparam1(affect);
+    CAMLlocal1(caml_variable);
+    caml_variable = caml_alloc(1, 0);
+    Field(caml_variable, 0) = affect;
+     CAMLreturn(caml_variable);
+}
+
+static value val_err(value affect) {
+    CAMLparam1(affect);
+    CAMLlocal1(caml_variable);
     caml_variable = caml_alloc(1, 1);
     Field(caml_variable, 0) = affect;
-    return caml_variable;
+    CAMLreturn(caml_variable);
 }
 
 /**
@@ -123,10 +143,10 @@ CAMLprim value caml_idevice_new_with_options(value udid_opt, value option) {
     idevice_error_t status;
     status = idevice_new_with_options(&device, udid, c_opt);
     if (status == IDEVICE_E_SUCCESS) {
-        caml_block = val_ok(caml_block, val_idevice_t(device));
+        caml_block = val_ok(val_idevice_t(device));
         CAMLreturn(caml_block);
     } else {
-        caml_block = val_err(caml_block, val_idevice_error(status));
+        caml_block = val_err(val_idevice_error(status));
         CAMLreturn(caml_block);
     }
 }
@@ -144,10 +164,10 @@ CAMLprim value caml_lockdownd_client_new_with_handshake(value caml_label, value 
     lockdownd_error_t status;
     status = lockdownd_client_new_with_handshake(device, &lockdown_client, label);
     if (status == LOCKDOWN_E_SUCCESS) {
-        caml_block = val_ok(caml_block, val_lockdownd_client_t(lockdown_client));
+        caml_block = val_ok(val_lockdownd_client_t(lockdown_client));
         CAMLreturn(caml_block);
     } else {
-        caml_block = val_err(caml_block, val_lockdownd_error(status));
+        caml_block = val_err(val_lockdownd_error(status));
         CAMLreturn(caml_block);
     }
 }
@@ -165,10 +185,10 @@ CAMLprim value caml_lockdownd_start_service(value caml_identifier, value caml_lo
     lockdownd_error_t status;
     status = lockdownd_start_service(client, identifier, &service);
     if (status == LOCKDOWN_E_SUCCESS) {
-        caml_block = val_ok(caml_block, val_lockdownd_service_descriptor_t(service));
+        caml_block = val_ok(val_lockdownd_service_descriptor_t(service));
         CAMLreturn(caml_block);
     } else {
-        caml_block = val_err(caml_block, val_lockdownd_error(status));
+        caml_block = val_err(val_lockdownd_error(status));
         CAMLreturn(caml_block);
     }
 }
@@ -182,11 +202,51 @@ CAMLprim value caml_afc_client_new(value caml_device, value caml_service) {
     afc_client_t client = NULL;
     status = afc_client_new(device, service, &client);
     if (AFC_E_SUCCESS == status) {
-        caml_block = val_ok(caml_block, val_afc_client_t(client));
+        caml_block = val_ok(val_afc_client_t(client));
         CAMLreturn(caml_block);
     } else {
-        caml_block = val_err(caml_block, val_afc_error(status));
+        caml_block = val_err(val_afc_error(status));
         CAMLreturn(caml_block);
     }
+}
 
+/**
+
+*/
+CAMLprim value caml_afc_read_directory(value caml_afc_client, value caml_str_path) {
+    CAMLparam2(caml_afc_client, caml_str_path);
+    CAMLlocal2(caml_result, caml_directory);
+    char** directory_info = NULL; 
+    const char* path = String_val(caml_str_path);
+    afc_client_t client = afc_client_t_val(caml_afc_client);
+    afc_error_t status;
+    status = afc_read_directory(client, path, &directory_info);
+    if (status == AFC_E_SUCCESS) {
+        caml_directory = init_directory((const char**) directory_info);
+        caml_result = val_ok(caml_directory);
+        afc_dictionary_free(directory_info);
+        CAMLreturn(caml_result);
+    } else {
+        caml_result = val_err(val_afc_error(status));
+        CAMLreturn(caml_result);
+    }
+}
+
+CAMLprim value caml_afc_get_file_info(value caml_afc_client, value caml_str_path) {
+    CAMLparam2(caml_afc_client, caml_str_path);
+    CAMLlocal2(caml_result, caml_directory);
+    char** directory_info = NULL; 
+    const char* path = String_val(caml_str_path);
+    afc_client_t client = afc_client_t_val(caml_afc_client);
+    afc_error_t status;
+    status = afc_get_file_info(client, path, &directory_info);
+    if (status == AFC_E_SUCCESS) {
+        caml_directory = init_directory((const char**) directory_info);
+        caml_result = val_ok(caml_directory);
+        afc_dictionary_free(directory_info);
+        CAMLreturn(caml_result);
+    } else {
+        caml_result = val_err(val_afc_error(status));
+        CAMLreturn(caml_result);
+    }
 }

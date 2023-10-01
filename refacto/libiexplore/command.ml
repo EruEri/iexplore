@@ -15,6 +15,8 @@
 (*                                                                                            *)
 (**********************************************************************************************)
 
+module type Command = sig
+  val name : string
 
-let name = "ls"
-
+  val eval : string array -> Phone.t -> int
+end

@@ -43,5 +43,10 @@ let navigate run =
 
 let run cmd = 
   let () = cmd in
-  let () = print_endline "Exlpore todo" in
+  let phone = 
+    match Libiexplore.Phone.create () with
+    | Ok phone -> phone
+    | Error e -> raise @@ Libiexplore.Error.exn_explore_error e
+  in
+  let () = Libiexplore.Repl.repl phone in
   ()

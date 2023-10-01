@@ -19,3 +19,4 @@
 module Phone = Phone
 module Error = Error
 module Path = Path
+module Repl = Repl

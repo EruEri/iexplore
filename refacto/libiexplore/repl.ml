@@ -16,32 +16,36 @@
 (**********************************************************************************************)
 
 
-type t = {
-  device: Cbindings.ImobileDevice.idevice_t;
-  lockdown_client: Cbindings.ImobileDevice.lockdownd_client_t;
-  service: Cbindings.ImobileDevice.lockdownd_service_descriptor_t;
-  client: Cbindings.ImobileDevice.afc_client_t;
-  path: Path.t;
-}
+(*
+  Maybe in a config file one day   
+*)
+let prompt = ">"
 
+let read () =
+  let () = Printf.printf "%s" prompt in
+  let s = read_line () in
+  s 
 
-let create () = 
-  let open Cbindings.ImobileDevice in
-  let (let*) = Result.bind in
-  let ( |? ) = Result.map_error in
-  let ok = Result.ok in
-  let* device = Error.device_error |? idevice_new_with_options IDEVICE_LOOKUP_USBMUX in
-  let () = at_exit @@ fun () -> idevice_free device in
-  let* lockdown_client = Error.lockdown_error |? lockdownd_client_new_with_handshake device in
-  let () = at_exit @@ fun () -> lockdownd_client_free lockdown_client in
-  let* service = Error.lockdown_error |? lockdownd_start_service lockdown_client in
-  let () = at_exit @@ fun () -> lockdownd_service_descriptor_free service in
-  let* client = Error.afc_error |? afc_client_new device service in
-  let () = at_exit @@ fun () -> afc_client_free client in
-  let path = Path.root in
-  ok @@ {device; lockdown_client; service; client; path} 
+module Commands = Map.Make(String)
 
-let read_path : t -> (string array, Cbindings.ImobileDevice.afc_error_t) result = 
-  fun {device = _; lockdown_client = _; service = _; client; path} -> 
-    let path = Path.to_string path in
-    Cbindings.ImobileDevice.afc_read_directory client path
+let commands = 
+  Commands.empty
+  |> Commands.add Ls.name ( module Ls : Command.Command)
+
+let rec repl code phone = 
+  try 
+    let contents = read () in
+    let contents = String.split_on_char ' '  contents in
+    match contents with
+      | [] -> repl 0 phone
+      | "exit"::_ -> ()
+      | "$?"::_ -> let () = Printf.printf "%u" code in repl 0 phone
+      | t::argv -> 
+        let (module C) = Commands.find t commands in
+        let i = C.eval (Array.of_list argv) phone in
+        repl i phone
+  with 
+    End_of_file -> () 
+    | Not_found -> let () = prerr_endline "unknwon command" in repl 127 phone
+
+let repl = repl 0
