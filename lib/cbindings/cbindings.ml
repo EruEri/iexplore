@@ -15,29 +15,5 @@
 (*                                                                                            *)
 (**********************************************************************************************)
 
-module C = Configurator.V1
 
-let cflag = Printf.sprintf "cflags_%s.sexp"
-let clibs = Printf.sprintf "clibrary_flags_%s.sexp"
-let generate_flag_libs name = (cflag name, clibs name)
-
-let pkg_config libname () =
-  let cflags, clibs = generate_flag_libs libname in
-  C.main ~name:libname (fun c ->
-      let conf =
-        match C.Pkg_config.get c with
-        | None ->
-            C.die "pkg-config not found"
-        | Some pc -> (
-            match C.Pkg_config.query pc ~package:libname with
-            | None ->
-                C.die "%s pkg-config query not found" libname
-            | Some deps ->
-                deps
-          )
-      in
-      C.Flags.write_sexp cflags conf.cflags;
-      C.Flags.write_sexp clibs conf.libs
-  )
-
-let () = pkg_config "libimobiledevice-1.0" ()
+module ImobileDevice = Libimobiledevice

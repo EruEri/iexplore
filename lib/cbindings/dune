@@ -15,11 +15,12 @@
 ;*                                                                                            *;
 ;**********************************************************************************************;
 
-
 (include_subdirs unqualified)
 
 (rule
- (targets cflags_libimobiledevice.sexp clibrary_flags_libimobiledevice.sexp)
+ (targets
+  cflags_libimobiledevice-1.0.sexp
+  clibrary_flags_libimobiledevice-1.0.sexp)
  (action
   (run ./config/discover.exe)))
 
@@ -27,11 +28,11 @@
  (name cbindings)
  (foreign_stubs
   (language c)
-  (names )
+  (names caml_libimobiledevice)
   (flags
    (-Wall)
    (-std=c99)
    (-fPIC)
-   (:include cflags_libffi.sexp)))
+   (:include cflags_libimobiledevice-1.0.sexp)))
  (c_library_flags
-  (:include clibrary_flags_libffi.sexp)))
+  (:include clibrary_flags_libimobiledevice-1.0.sexp)))
